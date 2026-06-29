@@ -8,10 +8,12 @@ import ValuationsSection from '@/components/ValuationsSection'
 import AgentPipeline from '@/components/AgentPipeline'
 import { IntelligenceData } from '@/lib/types'
 
-type Tab = 'news' | 'competitors' | 'ideas' | 'valuations'
+type MainTab = 'mortgage' | 'valuations'
+type SubTab = 'news' | 'competitors' | 'ideas'
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<Tab>('news')
+  const [mainTab, setMainTab] = useState<MainTab>('mortgage')
+  const [subTab, setSubTab] = useState<SubTab>('news')
   const [data, setData] = useState<IntelligenceData | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -25,13 +27,6 @@ export default function Home() {
       setLastRefreshed(cachedTime ?? null)
     }
   }, [])
-
-  const TABS: { id: Tab; label: string; icon: string; count?: number }[] = [
-    { id: 'news', label: 'Industry News', icon: '📰', count: data?.news.length },
-    { id: 'competitors', label: 'Competitor Intel', icon: '🔭', count: data?.competitors.length },
-    { id: 'ideas', label: 'Strategic Ideas', icon: '💡', count: data?.ideas.length },
-    { id: 'valuations', label: 'Valuations', icon: '🏡', count: data?.valuations.news.length },
-  ]
 
   async function refresh() {
     setLoading(true)
@@ -52,32 +47,50 @@ export default function Home() {
     }
   }
 
+  const MORTGAGE_SUB_TABS = [
+    { id: 'news' as SubTab,        label: 'Industry News',    count: data?.news.length },
+    { id: 'competitors' as SubTab, label: 'Competitor Intel', count: data?.competitors.length },
+    { id: 'ideas' as SubTab,       label: 'Strategic Ideas',  count: data?.ideas.length },
+  ]
+
+  const VALUATION_SUB_TABS = [
+    { id: 'news' as SubTab,        label: 'Valuation News',   count: data?.valuations.news.length },
+    { id: 'competitors' as SubTab, label: 'Competitor Moves', count: data?.valuations.competitorMoves.length },
+    { id: 'ideas' as SubTab,       label: 'Valuation Ideas',  count: data?.valuations.ideas.length },
+  ]
+
+  const activeSubs = mainTab === 'mortgage' ? MORTGAGE_SUB_TABS : VALUATION_SUB_TABS
+
   return (
-    <div className="min-h-screen bg-[#0f1117] text-white">
+    <div className="min-h-screen bg-[#0a0c10] text-white flex flex-col">
+
       {/* Header */}
-      <header className="border-b border-white/10 bg-[#0f1117]/80 backdrop-blur-sm sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-500/20">
-              <span className="text-white font-bold text-sm tracking-tight">SL</span>
+      <header className="border-b border-white/8 bg-[#0a0c10]/90 backdrop-blur-md sticky top-0 z-20">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/25 flex-shrink-0">
+              <span className="text-white font-bold text-xs tracking-tight">SL</span>
             </div>
             <div>
-              <h1 className="text-base font-semibold text-white leading-none">ServiceLink Intelligence Portal</h1>
-              <p className="text-xs text-white/40 mt-0.5">AMC &amp; Appraisal Industry · Last 7 days</p>
+              <h1 className="text-sm font-semibold text-white leading-none tracking-tight">ServiceLink Intelligence Portal</h1>
+              <p className="text-[11px] text-white/35 mt-0.5">AMC &amp; Appraisal Industry · Last 7 days</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="text-right hidden sm:block">
-              <p className="text-xs text-white/30">Ankit Shukla</p>
-              {lastRefreshed && (
-                <p className="text-xs text-white/20">Updated {lastRefreshed}</p>
-              )}
+          <div className="flex items-center gap-5">
+            {lastRefreshed && !loading && (
+              <div className="hidden sm:flex items-center gap-1.5 text-[11px] text-white/25">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                Updated {lastRefreshed}
+              </div>
+            )}
+            <div className="hidden sm:block text-[11px] text-white/25 border-r border-white/10 pr-5">
+              Ankit Shukla
             </div>
             <button
               onClick={refresh}
               disabled={loading}
-              className="bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 shadow-lg shadow-blue-500/20"
+              className="bg-blue-600 hover:bg-blue-500 active:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-2 shadow-md shadow-blue-500/20"
             >
               {loading ? (
                 <>
@@ -85,30 +98,30 @@ export default function Home() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
-                  Running agents...
+                  Running...
                 </>
               ) : (
-                <> Refresh Intelligence</>
+                <>↻ Refresh Intelligence</>
               )}
             </button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-8">
 
-        {/* Stats bar — only when data loaded */}
+        {/* Stats bar */}
         {data && !loading && (
-          <div className="grid grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
             {[
-              { label: 'Industry Articles', value: data.news.length, color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/20' },
-              { label: 'Competitors Tracked', value: data.competitors.length, color: 'text-purple-400', bg: 'bg-purple-500/10 border-purple-500/20' },
-              { label: 'Strategic Ideas', value: data.ideas.length, color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20' },
-              { label: 'Valuation Articles', value: data.valuations.news.length, color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/20' },
-            ].map((stat) => (
-              <div key={stat.label} className={`border rounded-xl p-4 ${stat.bg}`}>
-                <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
-                <p className="text-xs text-white/40 mt-0.5">{stat.label}</p>
+              { label: 'Industry Articles',  value: data.news.length,              color: 'text-blue-400',   border: 'border-blue-500/15',   bg: 'bg-blue-500/5' },
+              { label: 'Competitors',         value: data.competitors.length,       color: 'text-purple-400', border: 'border-purple-500/15', bg: 'bg-purple-500/5' },
+              { label: 'Strategic Ideas',     value: data.ideas.length,             color: 'text-emerald-400',border: 'border-emerald-500/15',bg: 'bg-emerald-500/5' },
+              { label: 'Valuation Articles',  value: data.valuations.news.length,   color: 'text-amber-400',  border: 'border-amber-500/15',  bg: 'bg-amber-500/5' },
+            ].map((s) => (
+              <div key={s.label} className={`rounded-xl border p-4 ${s.border} ${s.bg}`}>
+                <p className={`text-2xl font-bold tabular-nums ${s.color}`}>{s.value}</p>
+                <p className="text-[11px] text-white/35 mt-1 font-medium">{s.label}</p>
               </div>
             ))}
           </div>
@@ -116,29 +129,24 @@ export default function Home() {
 
         {/* Empty state */}
         {!data && !loading && (
-          <div className="flex flex-col items-center justify-center py-32 text-center">
-            <div className="w-20 h-20 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-6">
-              <span className="text-4xl">🔍</span>
+          <div className="flex flex-col items-center justify-center py-28 text-center">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 border border-blue-500/20 flex items-center justify-center mb-5">
+              <span className="text-3xl">🔍</span>
             </div>
-            <h2 className="text-xl font-semibold text-white mb-2">Ready to gather intelligence</h2>
-            <p className="text-white/40 mb-8 max-w-sm text-sm leading-relaxed">
-              3 agents will run in parallel — scanning AMC industry news, monitoring 6 competitors, and generating strategic ideas for ServiceLink.
+            <h2 className="text-lg font-semibold text-white mb-2">Ready to gather intelligence</h2>
+            <p className="text-white/35 mb-8 max-w-xs text-sm leading-relaxed">
+              4 agents will run — scanning AMC news, monitoring competitors, tracking valuations, and generating strategic ideas.
             </p>
-            <div className="flex gap-3 mb-8 text-xs text-white/30">
-              <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span>News Agent</span>
-              <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-purple-400"></span>Competitor Agent</span>
-              <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>Ideas Agent</span>
-            </div>
             <button
               onClick={refresh}
-              className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-xl font-medium transition-all shadow-lg shadow-blue-500/20 text-sm"
+              className="bg-blue-600 hover:bg-blue-500 text-white px-7 py-2.5 rounded-xl font-semibold transition-all shadow-lg shadow-blue-500/20 text-sm"
             >
               Run Intelligence Pipeline
             </button>
           </div>
         )}
 
-        {/* Loading state */}
+        {/* Loading */}
         {loading && <AgentPipeline />}
 
         {/* Error */}
@@ -148,43 +156,68 @@ export default function Home() {
           </div>
         )}
 
-        {/* Tabs + content */}
+        {/* Main content */}
         {data && !loading && (
-          <>
-            <div className="flex gap-1 bg-white/5 p-1 rounded-xl mb-6 w-fit border border-white/10">
-              {TABS.map((tab) => (
+          <div>
+            {/* ── Main tabs ── */}
+            <div className="flex gap-2 mb-6">
+              {([
+                { id: 'mortgage' as MainTab,   label: 'Mortgage Industry', icon: '🏦' },
+                { id: 'valuations' as MainTab, label: 'Valuations',        icon: '🏡' },
+              ]).map((t) => (
                 <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
-                    activeTab === tab.id
-                      ? 'bg-white/10 text-white shadow-sm'
-                      : 'text-white/40 hover:text-white/70'
+                  key={t.id}
+                  onClick={() => { setMainTab(t.id); setSubTab('news') }}
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                    mainTab === t.id
+                      ? 'bg-white text-gray-900 shadow-lg'
+                      : 'bg-white/5 text-white/50 hover:bg-white/8 hover:text-white/80 border border-white/8'
                   }`}
                 >
-                  <span>{tab.icon}</span>
-                  {tab.label}
-                  {tab.count !== undefined && (
-                    <span className={`text-xs px-1.5 py-0.5 rounded-full ${
-                      activeTab === tab.id ? 'bg-blue-500/30 text-blue-300' : 'bg-white/10 text-white/30'
+                  <span>{t.icon}</span>
+                  {t.label}
+                </button>
+              ))}
+            </div>
+
+            {/* ── Sub tabs ── */}
+            <div className="flex gap-1 border-b border-white/8 mb-6">
+              {activeSubs.map((t) => (
+                <button
+                  key={t.id}
+                  onClick={() => setSubTab(t.id)}
+                  className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-all border-b-2 -mb-px ${
+                    subTab === t.id
+                      ? 'border-blue-500 text-white'
+                      : 'border-transparent text-white/35 hover:text-white/60 hover:border-white/20'
+                  }`}
+                >
+                  {t.label}
+                  {t.count !== undefined && (
+                    <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${
+                      subTab === t.id ? 'bg-blue-500/20 text-blue-300' : 'bg-white/8 text-white/25'
                     }`}>
-                      {tab.count}
+                      {t.count}
                     </span>
                   )}
                 </button>
               ))}
             </div>
 
-            {activeTab === 'news' && <NewsSection articles={data.news} />}
-            {activeTab === 'competitors' && <CompetitorSection competitors={data.competitors} />}
-            {activeTab === 'ideas' && <IdeasSection ideas={data.ideas} />}
-            {activeTab === 'valuations' && <ValuationsSection data={data.valuations} />}
-          </>
+            {/* ── Content ── */}
+            {mainTab === 'mortgage' && subTab === 'news'        && <NewsSection articles={data.news} />}
+            {mainTab === 'mortgage' && subTab === 'competitors' && <CompetitorSection competitors={data.competitors} />}
+            {mainTab === 'mortgage' && subTab === 'ideas'       && <IdeasSection ideas={data.ideas} />}
+
+            {mainTab === 'valuations' && subTab === 'news'        && <NewsSection articles={data.valuations.news} />}
+            {mainTab === 'valuations' && subTab === 'competitors' && <CompetitorSection competitors={data.valuations.competitorMoves} />}
+            {mainTab === 'valuations' && subTab === 'ideas'       && <IdeasSection ideas={data.valuations.ideas} />}
+          </div>
         )}
       </main>
 
-      <footer className="border-t border-white/5 py-4 mt-8">
-        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between text-xs text-white/20">
+      <footer className="border-t border-white/5 py-4 mt-auto">
+        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between text-[11px] text-white/15">
           <span>ServiceLink Intelligence Portal</span>
           <span>Ankit Shukla · Powered by Claude</span>
         </div>

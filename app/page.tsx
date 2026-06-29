@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import NewsSection from '@/components/NewsSection'
 import CompetitorSection from '@/components/CompetitorSection'
 import IdeasSection from '@/components/IdeasSection'
@@ -16,6 +16,15 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null)
   const [lastRefreshed, setLastRefreshed] = useState<string | null>(null)
 
+  useEffect(() => {
+    const cached = localStorage.getItem('sl-intel-data')
+    const cachedTime = localStorage.getItem('sl-intel-time')
+    if (cached) {
+      setData(JSON.parse(cached))
+      setLastRefreshed(cachedTime ?? null)
+    }
+  }, [])
+
   const TABS: { id: Tab; label: string; icon: string; count?: number }[] = [
     { id: 'news', label: 'Industry News', icon: '📰', count: data?.news.length },
     { id: 'competitors', label: 'Competitor Intel', icon: '🔭', count: data?.competitors.length },
@@ -30,8 +39,11 @@ export default function Home() {
       const res = await fetch('/api/intelligence')
       if (!res.ok) throw new Error('Failed to fetch intelligence data')
       const json: IntelligenceData = await res.json()
+      const timeStr = new Date().toLocaleTimeString()
       setData(json)
-      setLastRefreshed(new Date().toLocaleTimeString())
+      setLastRefreshed(timeStr)
+      localStorage.setItem('sl-intel-data', JSON.stringify(json))
+      localStorage.setItem('sl-intel-time', timeStr)
     } catch {
       setError('Something went wrong. Check your API keys and try again.')
     } finally {

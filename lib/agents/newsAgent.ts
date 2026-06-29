@@ -20,6 +20,7 @@ export async function runNewsAgent(): Promise<NewsArticle[]> {
         searchDepth: 'basic',
         maxResults: 5,
         includeAnswer: false,
+        days: 7,
       })
 
       for (const r of result.results) {

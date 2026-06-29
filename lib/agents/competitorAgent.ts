@@ -16,11 +16,12 @@ export async function runCompetitorAgent(): Promise<CompetitorNews[]> {
   const results = await Promise.all(
     COMPETITORS.map(async (competitor) => {
       const result = await client.search(
-        `${competitor} appraisal management company news 2025`,
+        `${competitor} appraisal management company news`,
         {
           searchDepth: 'basic',
           maxResults: 4,
           includeAnswer: false,
+          days: 7,
         }
       )
 

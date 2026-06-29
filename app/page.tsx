@@ -15,10 +15,10 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null)
   const [lastRefreshed, setLastRefreshed] = useState<string | null>(null)
 
-  const TABS: { id: Tab; label: string; count?: number }[] = [
-    { id: 'news', label: 'Industry News', count: data?.news.length },
-    { id: 'competitors', label: 'Competitor Intel', count: data?.competitors.length },
-    { id: 'ideas', label: 'Strategic Ideas', count: data?.ideas.length },
+  const TABS: { id: Tab; label: string; icon: string; count?: number }[] = [
+    { id: 'news', label: 'Industry News', icon: '📰', count: data?.news.length },
+    { id: 'competitors', label: 'Competitor Intel', icon: '🔭', count: data?.competitors.length },
+    { id: 'ideas', label: 'Strategic Ideas', icon: '💡', count: data?.ideas.length },
   ]
 
   async function refresh() {
@@ -30,7 +30,7 @@ export default function Home() {
       const json: IntelligenceData = await res.json()
       setData(json)
       setLastRefreshed(new Date().toLocaleTimeString())
-    } catch (e) {
+    } catch {
       setError('Something went wrong. Check your API keys and try again.')
     } finally {
       setLoading(false)
@@ -38,38 +38,42 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#0f1117] text-white">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+      <header className="border-b border-white/10 bg-[#0f1117]/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">SL</span>
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-500/20">
+              <span className="text-white font-bold text-sm tracking-tight">SL</span>
             </div>
             <div>
-              <h1 className="text-lg font-bold text-gray-900">ServiceLink Intelligence Portal</h1>
-              <p className="text-xs text-gray-500">AMC &amp; Appraisal Industry Monitor</p>
+              <h1 className="text-base font-semibold text-white leading-none">ServiceLink Intelligence Portal</h1>
+              <p className="text-xs text-white/40 mt-0.5">AMC &amp; Appraisal Industry · Last 7 days</p>
             </div>
           </div>
+
           <div className="flex items-center gap-4">
-            {lastRefreshed && (
-              <span className="text-xs text-gray-400">Last refreshed: {lastRefreshed}</span>
-            )}
+            <div className="text-right hidden sm:block">
+              <p className="text-xs text-white/30">Ankit Shukla</p>
+              {lastRefreshed && (
+                <p className="text-xs text-white/20">Updated {lastRefreshed}</p>
+              )}
+            </div>
             <button
               onClick={refresh}
               disabled={loading}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+              className="bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 shadow-lg shadow-blue-500/20"
             >
               {loading ? (
                 <>
-                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                  <svg className="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24" fill="none">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
                   Running agents...
                 </>
               ) : (
-                <>&#8635; Refresh Intelligence</>
+                <> Refresh Intelligence</>
               )}
             </button>
           </div>
@@ -77,19 +81,41 @@ export default function Home() {
       </header>
 
       <main className="max-w-7xl mx-auto px-6 py-8">
+
+        {/* Stats bar — only when data loaded */}
+        {data && !loading && (
+          <div className="grid grid-cols-3 gap-4 mb-8">
+            {[
+              { label: 'Industry Articles', value: data.news.length, color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/20' },
+              { label: 'Competitors Tracked', value: data.competitors.length, color: 'text-purple-400', bg: 'bg-purple-500/10 border-purple-500/20' },
+              { label: 'Strategic Ideas', value: data.ideas.length, color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20' },
+            ].map((stat) => (
+              <div key={stat.label} className={`border rounded-xl p-4 ${stat.bg}`}>
+                <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
+                <p className="text-xs text-white/40 mt-0.5">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* Empty state */}
         {!data && !loading && (
-          <div className="text-center py-24">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-3xl">&#128269;</span>
+          <div className="flex flex-col items-center justify-center py-32 text-center">
+            <div className="w-20 h-20 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-6">
+              <span className="text-4xl">🔍</span>
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Ready to gather intelligence</h2>
-            <p className="text-gray-500 mb-6 max-w-md mx-auto">
-              Click &quot;Refresh Intelligence&quot; to run all three agents — News, Competitor Intel, and Ideas — in parallel.
+            <h2 className="text-xl font-semibold text-white mb-2">Ready to gather intelligence</h2>
+            <p className="text-white/40 mb-8 max-w-sm text-sm leading-relaxed">
+              3 agents will run in parallel — scanning AMC industry news, monitoring 6 competitors, and generating strategic ideas for ServiceLink.
             </p>
+            <div className="flex gap-3 mb-8 text-xs text-white/30">
+              <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span>News Agent</span>
+              <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-purple-400"></span>Competitor Agent</span>
+              <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>Ideas Agent</span>
+            </div>
             <button
               onClick={refresh}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+              className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-xl font-medium transition-all shadow-lg shadow-blue-500/20 text-sm"
             >
               Run Intelligence Pipeline
             </button>
@@ -98,23 +124,26 @@ export default function Home() {
 
         {/* Loading state */}
         {loading && (
-          <div className="text-center py-24">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-              <span className="text-3xl">&#9889;</span>
+          <div className="flex flex-col items-center justify-center py-32 text-center">
+            <div className="w-20 h-20 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-6">
+              <svg className="animate-spin h-8 w-8 text-blue-400" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Agents are running...</h2>
-            <div className="space-y-2 text-sm text-gray-500 max-w-xs mx-auto">
-              <div className="flex items-center gap-2 justify-center">
-                <span className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></span>
-                News Agent — scanning AMC industry
+            <h2 className="text-xl font-semibold text-white mb-6">Agents are running...</h2>
+            <div className="space-y-3 text-sm text-white/50">
+              <div className="flex items-center gap-3 bg-white/5 rounded-lg px-4 py-2.5">
+                <span className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></span>
+                <span>News Agent — scanning AMC &amp; appraisal industry</span>
               </div>
-              <div className="flex items-center gap-2 justify-center">
-                <span className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></span>
-                Competitor Agent — monitoring rivals
+              <div className="flex items-center gap-3 bg-white/5 rounded-lg px-4 py-2.5">
+                <span className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{animationDelay:'0.2s'}}></span>
+                <span>Competitor Agent — monitoring 6 rival companies</span>
               </div>
-              <div className="flex items-center gap-2 justify-center">
-                <span className="w-2 h-2 bg-green-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></span>
-                Ideas Agent — generating insights
+              <div className="flex items-center gap-3 bg-white/5 rounded-lg px-4 py-2.5">
+                <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" style={{animationDelay:'0.4s'}}></span>
+                <span>Ideas Agent — generating strategic insights with Claude</span>
               </div>
             </div>
           </div>
@@ -122,29 +151,30 @@ export default function Home() {
 
         {/* Error */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 text-sm">
+          <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl mb-6 text-sm">
             {error}
           </div>
         )}
 
-        {/* Data */}
+        {/* Tabs + content */}
         {data && !loading && (
           <>
-            <div className="flex gap-1 bg-gray-200 p-1 rounded-lg mb-6 w-fit">
+            <div className="flex gap-1 bg-white/5 p-1 rounded-xl mb-6 w-fit border border-white/10">
               {TABS.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all flex items-center gap-2 ${
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
                     activeTab === tab.id
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
+                      ? 'bg-white/10 text-white shadow-sm'
+                      : 'text-white/40 hover:text-white/70'
                   }`}
                 >
+                  <span>{tab.icon}</span>
                   {tab.label}
                   {tab.count !== undefined && (
                     <span className={`text-xs px-1.5 py-0.5 rounded-full ${
-                      activeTab === tab.id ? 'bg-blue-100 text-blue-700' : 'bg-gray-300 text-gray-600'
+                      activeTab === tab.id ? 'bg-blue-500/30 text-blue-300' : 'bg-white/10 text-white/30'
                     }`}>
                       {tab.count}
                     </span>
@@ -159,6 +189,13 @@ export default function Home() {
           </>
         )}
       </main>
+
+      <footer className="border-t border-white/5 py-4 mt-8">
+        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between text-xs text-white/20">
+          <span>ServiceLink Intelligence Portal</span>
+          <span>Ankit Shukla · Powered by Claude &amp; Tavily</span>
+        </div>
+      </footer>
     </div>
   )
 }

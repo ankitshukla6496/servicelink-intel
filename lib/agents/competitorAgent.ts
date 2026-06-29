@@ -1,5 +1,6 @@
 import { tavily } from '@tavily/core'
 import { CompetitorNews, NewsArticle } from '../types'
+import { isWithinLastWeek } from '../utils'
 
 const COMPETITORS = [
   'Class Valuation',
@@ -25,13 +26,15 @@ export async function runCompetitorAgent(): Promise<CompetitorNews[]> {
         }
       )
 
-      const articles: NewsArticle[] = result.results.map((r) => ({
-        title: r.title,
-        summary: r.content.slice(0, 300),
-        url: r.url,
-        source: new URL(r.url).hostname.replace('www.', ''),
-        publishedAt: r.publishedDate ?? new Date().toISOString(),
-      }))
+      const articles: NewsArticle[] = result.results
+        .filter((r) => isWithinLastWeek(r.publishedDate))
+        .map((r) => ({
+          title: r.title,
+          summary: r.content.slice(0, 300),
+          url: r.url,
+          source: new URL(r.url).hostname.replace('www.', ''),
+          publishedAt: r.publishedDate!,
+        }))
 
       return { competitor, articles }
     })

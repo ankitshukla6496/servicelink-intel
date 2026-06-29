@@ -1,5 +1,6 @@
 import { tavily } from '@tavily/core'
 import { anthropic } from '@ai-sdk/anthropic'
+import { isWithinLastWeek } from '../utils'
 import { generateObject } from 'ai'
 import { z } from 'zod'
 import { NewsArticle, CompetitorNews, Idea, ValuationData } from '../types'
@@ -59,14 +60,14 @@ async function fetchValuationNews(client: ReturnType<typeof tavily>): Promise<Ne
         days: 7,
       })
       for (const r of result.results) {
-        if (!seen.has(r.url)) {
+        if (!seen.has(r.url) && isWithinLastWeek(r.publishedDate)) {
           seen.add(r.url)
           articles.push({
             title: r.title,
             summary: r.content.slice(0, 300),
             url: r.url,
             source: new URL(r.url).hostname.replace('www.', ''),
-            publishedAt: r.publishedDate ?? new Date().toISOString(),
+            publishedAt: r.publishedDate!,
           })
         }
       }
@@ -88,13 +89,15 @@ async function fetchCompetitorValuationMoves(client: ReturnType<typeof tavily>):
           days: 7,
         }
       )
-      const articles: NewsArticle[] = result.results.map((r) => ({
-        title: r.title,
-        summary: r.content.slice(0, 300),
-        url: r.url,
-        source: new URL(r.url).hostname.replace('www.', ''),
-        publishedAt: r.publishedDate ?? new Date().toISOString(),
-      }))
+      const articles: NewsArticle[] = result.results
+        .filter((r) => isWithinLastWeek(r.publishedDate))
+        .map((r) => ({
+          title: r.title,
+          summary: r.content.slice(0, 300),
+          url: r.url,
+          source: new URL(r.url).hostname.replace('www.', ''),
+          publishedAt: r.publishedDate!,
+        }))
       return { competitor, articles }
     })
   )

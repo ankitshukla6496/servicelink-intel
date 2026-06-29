@@ -5,6 +5,7 @@ import NewsSection from '@/components/NewsSection'
 import CompetitorSection from '@/components/CompetitorSection'
 import IdeasSection from '@/components/IdeasSection'
 import ValuationsSection from '@/components/ValuationsSection'
+import AgentPipeline from '@/components/AgentPipeline'
 import { IntelligenceData } from '@/lib/types'
 
 type Tab = 'news' | 'competitors' | 'ideas' | 'valuations'
@@ -138,35 +139,7 @@ export default function Home() {
         )}
 
         {/* Loading state */}
-        {loading && (
-          <div className="flex flex-col items-center justify-center py-32 text-center">
-            <div className="w-20 h-20 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-6">
-              <svg className="animate-spin h-8 w-8 text-blue-400" viewBox="0 0 24 24" fill="none">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-              </svg>
-            </div>
-            <h2 className="text-xl font-semibold text-white mb-6">Agents are running...</h2>
-            <div className="space-y-3 text-sm text-white/50">
-              <div className="flex items-center gap-3 bg-white/5 rounded-lg px-4 py-2.5">
-                <span className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></span>
-                <span>News Agent — scanning AMC &amp; appraisal industry</span>
-              </div>
-              <div className="flex items-center gap-3 bg-white/5 rounded-lg px-4 py-2.5">
-                <span className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" style={{animationDelay:'0.2s'}}></span>
-                <span>Competitor Agent — monitoring 6 rival companies</span>
-              </div>
-              <div className="flex items-center gap-3 bg-white/5 rounded-lg px-4 py-2.5">
-                <span className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" style={{animationDelay:'0.4s'}}></span>
-                <span>Valuation Agent — scanning valuation &amp; AVM trends</span>
-              </div>
-              <div className="flex items-center gap-3 bg-white/5 rounded-lg px-4 py-2.5">
-                <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" style={{animationDelay:'0.6s'}}></span>
-                <span>Ideas Agent — generating strategic insights with Claude</span>
-              </div>
-            </div>
-          </div>
-        )}
+        {loading && <AgentPipeline />}
 
         {/* Error */}
         {error && (
@@ -213,7 +186,7 @@ export default function Home() {
       <footer className="border-t border-white/5 py-4 mt-8">
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between text-xs text-white/20">
           <span>ServiceLink Intelligence Portal</span>
-          <span>Ankit Shukla · Powered by Claude &amp; Tavily</span>
+          <span>Ankit Shukla · Powered by Claude</span>
         </div>
       </footer>
     </div>

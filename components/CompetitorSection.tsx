@@ -3,13 +3,10 @@
 import { useState } from 'react'
 import { CompetitorNews } from '@/lib/types'
 
-function timeAgo(dateStr: string) {
-  const diff = Date.now() - new Date(dateStr).getTime()
-  const days = Math.floor(diff / 86400000)
-  const hours = Math.floor(diff / 3600000)
-  if (days > 0) return `${days}d ago`
-  if (hours > 0) return `${hours}h ago`
-  return 'Just now'
+function formatDate(dateStr: string) {
+  const date = new Date(dateStr)
+  if (isNaN(date.getTime())) return ''
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
 const COLORS = [
@@ -71,7 +68,7 @@ export default function CompetitorSection({ competitors }: { competitors: Compet
               <span className="text-xs font-medium text-white/40 bg-white/5 border border-white/10 px-2 py-0.5 rounded-md">
                 {article.source}
               </span>
-              <span className="text-xs text-white/30 flex-shrink-0">{timeAgo(article.publishedAt)}</span>
+              <span className="text-xs text-white/30 flex-shrink-0">{formatDate(article.publishedAt)}</span>
             </div>
             <h3 className="font-semibold text-white/90 group-hover:text-white text-sm leading-snug mb-2 transition-colors">
               {article.title}

@@ -2,13 +2,10 @@
 
 import { NewsArticle } from '@/lib/types'
 
-function timeAgo(dateStr: string) {
-  const diff = Date.now() - new Date(dateStr).getTime()
-  const days = Math.floor(diff / 86400000)
-  const hours = Math.floor(diff / 3600000)
-  if (days > 0) return `${days}d ago`
-  if (hours > 0) return `${hours}h ago`
-  return 'Just now'
+function formatDate(dateStr: string) {
+  const date = new Date(dateStr)
+  if (isNaN(date.getTime())) return ''
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
 export default function NewsSection({ articles }: { articles: NewsArticle[] }) {
@@ -26,7 +23,7 @@ export default function NewsSection({ articles }: { articles: NewsArticle[] }) {
             <span className="text-xs font-medium text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-md">
               {article.source}
             </span>
-            <span className="text-xs text-white/30 flex-shrink-0">{timeAgo(article.publishedAt)}</span>
+            <span className="text-xs text-white/30 flex-shrink-0">{formatDate(article.publishedAt)}</span>
           </div>
           <h3 className="font-semibold text-white/90 group-hover:text-white text-sm leading-snug mb-2 transition-colors">
             {article.title}

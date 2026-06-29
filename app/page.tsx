@@ -110,22 +110,6 @@ export default function Home() {
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-8">
 
-        {/* Stats bar */}
-        {data && !loading && (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
-            {[
-              { label: 'Industry Articles',  value: data.news.length,              color: 'text-blue-400',   border: 'border-blue-500/15',   bg: 'bg-blue-500/5' },
-              { label: 'Competitors',         value: data.competitors.length,       color: 'text-purple-400', border: 'border-purple-500/15', bg: 'bg-purple-500/5' },
-              { label: 'Strategic Ideas',     value: data.ideas.length,             color: 'text-emerald-400',border: 'border-emerald-500/15',bg: 'bg-emerald-500/5' },
-              { label: 'Valuation Articles',  value: data.valuations.news.length,   color: 'text-amber-400',  border: 'border-amber-500/15',  bg: 'bg-amber-500/5' },
-            ].map((s) => (
-              <div key={s.label} className={`rounded-xl border p-4 ${s.border} ${s.bg}`}>
-                <p className={`text-2xl font-bold tabular-nums ${s.color}`}>{s.value}</p>
-                <p className="text-[11px] text-white/35 mt-1 font-medium">{s.label}</p>
-              </div>
-            ))}
-          </div>
-        )}
 
         {/* Empty state */}
         {!data && !loading && (

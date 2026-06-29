@@ -4,9 +4,10 @@ import { useState } from 'react'
 import NewsSection from '@/components/NewsSection'
 import CompetitorSection from '@/components/CompetitorSection'
 import IdeasSection from '@/components/IdeasSection'
+import ValuationsSection from '@/components/ValuationsSection'
 import { IntelligenceData } from '@/lib/types'
 
-type Tab = 'news' | 'competitors' | 'ideas'
+type Tab = 'news' | 'competitors' | 'ideas' | 'valuations'
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<Tab>('news')
@@ -19,6 +20,7 @@ export default function Home() {
     { id: 'news', label: 'Industry News', icon: '📰', count: data?.news.length },
     { id: 'competitors', label: 'Competitor Intel', icon: '🔭', count: data?.competitors.length },
     { id: 'ideas', label: 'Strategic Ideas', icon: '💡', count: data?.ideas.length },
+    { id: 'valuations', label: 'Valuations', icon: '🏡', count: data?.valuations.news.length },
   ]
 
   async function refresh() {
@@ -84,11 +86,12 @@ export default function Home() {
 
         {/* Stats bar — only when data loaded */}
         {data && !loading && (
-          <div className="grid grid-cols-3 gap-4 mb-8">
+          <div className="grid grid-cols-4 gap-4 mb-8">
             {[
               { label: 'Industry Articles', value: data.news.length, color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/20' },
               { label: 'Competitors Tracked', value: data.competitors.length, color: 'text-purple-400', bg: 'bg-purple-500/10 border-purple-500/20' },
               { label: 'Strategic Ideas', value: data.ideas.length, color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20' },
+              { label: 'Valuation Articles', value: data.valuations.news.length, color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/20' },
             ].map((stat) => (
               <div key={stat.label} className={`border rounded-xl p-4 ${stat.bg}`}>
                 <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
@@ -142,7 +145,11 @@ export default function Home() {
                 <span>Competitor Agent — monitoring 6 rival companies</span>
               </div>
               <div className="flex items-center gap-3 bg-white/5 rounded-lg px-4 py-2.5">
-                <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" style={{animationDelay:'0.4s'}}></span>
+                <span className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" style={{animationDelay:'0.4s'}}></span>
+                <span>Valuation Agent — scanning valuation &amp; AVM trends</span>
+              </div>
+              <div className="flex items-center gap-3 bg-white/5 rounded-lg px-4 py-2.5">
+                <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" style={{animationDelay:'0.6s'}}></span>
                 <span>Ideas Agent — generating strategic insights with Claude</span>
               </div>
             </div>
@@ -186,6 +193,7 @@ export default function Home() {
             {activeTab === 'news' && <NewsSection articles={data.news} />}
             {activeTab === 'competitors' && <CompetitorSection competitors={data.competitors} />}
             {activeTab === 'ideas' && <IdeasSection ideas={data.ideas} />}
+            {activeTab === 'valuations' && <ValuationsSection data={data.valuations} />}
           </>
         )}
       </main>

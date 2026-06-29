@@ -17,9 +17,16 @@ export interface Idea {
   category: 'opportunity' | 'threat' | 'strategy' | 'innovation'
 }
 
+export interface ValuationData {
+  news: NewsArticle[]
+  competitorMoves: CompetitorNews[]
+  ideas: Idea[]
+}
+
 export interface IntelligenceData {
   news: NewsArticle[]
   competitors: CompetitorNews[]
   ideas: Idea[]
+  valuations: ValuationData
   generatedAt: string
 }

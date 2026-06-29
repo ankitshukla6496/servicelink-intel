@@ -1,6 +1,6 @@
 import { tavily } from '@tavily/core'
 import { CompetitorNews, NewsArticle } from '../types'
-import { isWithinLastWeek } from '../utils'
+import { isNotOlderThanWeek } from '../utils'
 
 const COMPETITORS = [
   'Class Valuation',
@@ -27,7 +27,7 @@ export async function runCompetitorAgent(): Promise<CompetitorNews[]> {
       )
 
       const articles: NewsArticle[] = result.results
-        .filter((r) => isWithinLastWeek(r.publishedDate))
+        .filter((r) => isNotOlderThanWeek(r.publishedDate))
         .map((r) => ({
           title: r.title,
           summary: r.content.slice(0, 300),

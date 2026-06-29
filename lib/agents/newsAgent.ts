@@ -1,6 +1,6 @@
 import { tavily } from '@tavily/core'
 import { NewsArticle } from '../types'
-import { isWithinLastWeek } from '../utils'
+import { isNotOlderThanWeek } from '../utils'
 
 const DOMAIN_QUERIES = [
   'appraisal management company AMC industry news 2025',
@@ -25,7 +25,7 @@ export async function runNewsAgent(): Promise<NewsArticle[]> {
       })
 
       for (const r of result.results) {
-        if (!seen.has(r.url) && isWithinLastWeek(r.publishedDate)) {
+        if (!seen.has(r.url) && isNotOlderThanWeek(r.publishedDate)) {
           seen.add(r.url)
           articles.push({
             title: r.title,
